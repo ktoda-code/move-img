@@ -12,7 +12,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.WindowScope
 import com.ktoda.moveimg.data.config.LocalAppConfig
-import com.ktoda.moveimg.ui.components.TitleBar
 import com.ktoda.moveimg.ui.screens.MainScreen
 
 @Composable
@@ -30,7 +29,6 @@ fun WindowScope.App() {
             .padding(1.dp)
     ) {
         Column(Modifier.fillMaxSize()) {
-            TitleBar()
             MainScreen()
         }
     }
