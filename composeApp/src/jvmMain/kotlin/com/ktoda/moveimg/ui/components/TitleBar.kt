@@ -71,7 +71,7 @@ fun WindowScope.TitleBar(
         }
 
         // Minimize (-)
-        WindowButton(onClick = { windowState.isMinimized = true }) { color, _ ->
+        WindowButton(onClick = { windowState.isMinimized = true }) { color ->
             Canvas(Modifier.fillMaxSize()) {
                 drawLine(
                     color = color,
@@ -91,7 +91,7 @@ fun WindowScope.TitleBar(
                     WindowPlacement.Maximized
                 }
             }
-        ) { iconColor, bgColor ->
+        ) { iconColor ->
             Canvas(Modifier.fillMaxSize()) {
                 val strokeWidth = 1.5f
                 val cornerRadius = CornerRadius(2.dp.toPx())
@@ -142,9 +142,13 @@ fun WindowScope.TitleBar(
             onClick = onClose,
             isClose = true,
             isMaximized = isMaximized // <--- Important!
-        ) { color, _ ->
+        ) { color ->
             Canvas(Modifier.fillMaxSize()) {
-                drawLine(color = color, start = Offset.Zero, end = Offset(size.width, size.height), strokeWidth = 1.5f)
+                drawLine(color = color,
+                    start = Offset.Zero,
+                    end = Offset(size.width,size.height),
+                    strokeWidth = 1.5f
+                )
                 drawLine(
                     color = color,
                     start = Offset(0f, size.height),
@@ -162,7 +166,7 @@ private fun WindowButton(
     onClick: () -> Unit,
     isClose: Boolean = false,
     isMaximized: Boolean = false,
-    content: @Composable (iconColor: Color, bgColor: Color) -> Unit
+    content: @Composable (iconColor: Color) -> Unit
 ) {
     val appConfigs = LocalAppConfig.current
     var isHovered by remember { mutableStateOf(false) }
@@ -178,11 +182,10 @@ private fun WindowButton(
 
     val currentBg = when {
         isClose && isHovered -> Color(0xFFE81123)
-        isHovered -> appConfigs.textClr.copy(alpha = 0.05f)
+        isHovered -> appConfigs.textClr.copy(alpha = 0.10f)
         else -> Color.Transparent
     }
 
-    val maskColor = if (currentBg == Color.Transparent) appConfigs.panelBgClr else currentBg
     val iconColor = if (isClose && isHovered) Color.White else appConfigs.textClr
 
     Box(
@@ -197,7 +200,7 @@ private fun WindowButton(
         contentAlignment = Alignment.Center
     ) {
         Box(Modifier.size(10.dp)) {
-            content(iconColor, maskColor)
+            content(iconColor)
         }
     }
 }

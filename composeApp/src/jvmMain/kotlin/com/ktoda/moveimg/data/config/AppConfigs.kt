@@ -2,15 +2,7 @@ package com.ktoda.moveimg.data.config
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -23,12 +15,12 @@ data class AppConfigs(
     val panelBgClr: Color,
     val textClr: Color,
     val borderClr: Color,
-    val accentClr: Color, // New: Dynamic Windows Accent
+    val accentClr: Color,
     val radius: Dp = 8.dp,
     val frameShape: RoundedCornerShape = RoundedCornerShape(radius)
 )
 
-// Default / Fallback definitions
+// --- DEFAULTS ---
 private val DefaultAccent = Color(0xFF0078D4) // Standard Windows Blue
 
 private val DarkPalette = AppConfigs(
@@ -47,19 +39,8 @@ private val LightPalette = AppConfigs(
     accentClr = DefaultAccent
 )
 
-// FOR NOW: Assuming we wll not change colors, panel colors and radius.
 val LocalAppConfig = staticCompositionLocalOf<AppConfigs> {
     error("No AppConfigs provided")
-}
-
-@Composable
-fun ProvideAppConfig(
-    appConfigs: AppConfigs,
-    content: @Composable () -> Unit
-) {
-    CompositionLocalProvider(LocalAppConfig provides appConfigs) {
-        content()
-    }
 }
 
 @Composable
@@ -67,17 +48,19 @@ fun MoveImgTheme(
     isDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    // 1. Pick the base palette (Light vs Dark)
-    val baseConfig = if (isDarkTheme) DarkPalette else LightPalette
-
-    // 2. Fetch the Windows Accent Color
-    // We use 'remember' so we don't read the registry on every single frame/recomposition
+    // 1. Fetch Windows Accent Color (Safe JNA Call)
+    // We use 'remember' so we don't hit the Registry on every frame.
     val windowsAccent = remember { WindowsThemeHelper.getSystemAccentColor() }
 
-    // 3. Create the final config by copying base and overriding accent
-    val finalConfig = baseConfig.copy(accentClr = windowsAccent)
+    // 2. Select and build the config
+    // We 'remember' this result so we don't allocate a new AppConfigs object
+    // unless the theme or accent color explicitly changes.
+    val appConfig = remember(isDarkTheme, windowsAccent) {
+        val basePalette = if (isDarkTheme) DarkPalette else LightPalette
+        basePalette.copy(accentClr = windowsAccent)
+    }
 
-    CompositionLocalProvider(LocalAppConfig provides finalConfig) {
+    CompositionLocalProvider(LocalAppConfig provides appConfig) {
         content()
     }
 }
@@ -88,6 +71,10 @@ fun MoveImgTheme(
 private object WindowsThemeHelper {
     fun getSystemAccentColor(): Color {
         return try {
+            // Check OS before calling JNA to prevent crashes on non-Windows dev machines
+            val os = System.getProperty("os.name").lowercase()
+            if (!os.contains("win")) return DefaultAccent
+
             val colorInt = Advapi32Util.registryGetIntValue(
                 WinReg.HKEY_CURRENT_USER,
                 "Software\\Microsoft\\Windows\\DWM",
@@ -105,7 +92,7 @@ private object WindowsThemeHelper {
 
             Color(red = r, green = g, blue = b, alpha = finalAlpha)
         } catch (e: Exception) {
-            // If we are not on Windows or registry fails, return default blue
+            // Fallback if registry access fails
             DefaultAccent
         }
     }

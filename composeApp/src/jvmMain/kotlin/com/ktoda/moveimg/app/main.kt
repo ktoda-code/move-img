@@ -29,7 +29,7 @@ fun main() = application {
     Window(
         onCloseRequest = ::exitApplication,
         state = initialWindowState,
-        title = "Move Images",
+        title = "moveimg",
         undecorated = true,
         transparent = true
     ) {
