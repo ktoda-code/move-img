@@ -13,37 +13,36 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.WindowScope
+import com.ktoda.moveimg.data.config.LocalAppConfig
 
 @Composable
 fun WindowScope.TitleBar() {
-    val panelClr = Color(0xFF14161B)
-    val textClr = Color(0xFFD0D0D0)
+    val appConfigs = LocalAppConfig.current
 
     WindowDraggableArea {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(44.dp)
-                .background(panelClr)
+                .background(appConfigs.panelBgClr)
                 .padding(horizontal = 12.dp)
                 .clip(
                     RoundedCornerShape(
-                        topStart = 14.dp,
-                        topEnd = 14.dp
+                        topStart = appConfigs.radius,
+                        topEnd = appConfigs.radius
                     )
                 ),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("MoveImg", color = textClr)
+            Text("MoveImg", color = appConfigs.textClr)
 
             Spacer(Modifier.weight(1f))
 
-            Text("—", color = textClr, modifier = Modifier.padding(8.dp))
-            Text("□", color = textClr, modifier = Modifier.padding(8.dp))
-            Text("✕", color = textClr, modifier = Modifier.padding(8.dp))
+            Text("\u2014", color = appConfigs.textClr, modifier = Modifier.padding(8.dp))
+            Text("\u25A1", color = appConfigs.textClr, modifier = Modifier.padding(8.dp))
+            Text("\u2715", color = appConfigs.textClr, modifier = Modifier.padding(8.dp))
         }
     }
 }

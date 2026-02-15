@@ -7,8 +7,12 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
+import com.ktoda.moveimg.data.config.AppConfigs
+import com.ktoda.moveimg.data.config.ProvideAppConfig
 
 fun main() = application {
+    val appConfigs = AppConfigs()
+
     val initialWindowState = WindowState(
         size = DpSize(
             width = 1200.dp,
@@ -24,6 +28,8 @@ fun main() = application {
         undecorated = true,
         transparent = true
     ) {
-        App()
+        ProvideAppConfig(appConfigs) {
+            App()
+        }
     }
 }

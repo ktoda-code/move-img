@@ -10,33 +10,29 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
+import com.ktoda.moveimg.data.config.LocalAppConfig
 
 @Composable
 fun MainScreen() {
-    // todo: Remove hard-coded values -> theme
-
-    val bgClr = Color(0xFF0E0F12)
-    val textClr = Color(0xFFD0D0D0)
+    val appConfigs = LocalAppConfig.current
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .clip(
                 RoundedCornerShape(
-                    bottomStart = 14.dp,
-                    bottomEnd = 14.dp
+                    bottomStart = appConfigs.radius,
+                    bottomEnd = appConfigs.radius
                 )
             )
-            .background(bgClr)
+            .background(appConfigs.frameBgClr)
     ) {
         Column(Modifier.fillMaxSize()) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                Text("Main Screen Content", color = textClr)
+                Text("Main Screen Content", color = appConfigs.textClr)
             }
         }
     }
