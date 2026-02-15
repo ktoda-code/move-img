@@ -27,6 +27,10 @@ kotlin {
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
+
+            //Windows Registry access to get the theme accent clr
+            implementation("net.java.dev.jna:jna:5.13.0")
+            implementation("net.java.dev.jna:jna-platform:5.13.0")
         }
     }
 }
@@ -34,7 +38,7 @@ kotlin {
 
 compose.desktop {
     application {
-        mainClass = "com.ktoda.moveimg.MainKt"
+        mainClass = "com.ktoda.moveimg.app.MainKt"
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
